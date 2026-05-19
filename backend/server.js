@@ -51,6 +51,34 @@ app.post('/api/prof', async (req, res) => {
   }
 });
 
+// Rotta per ottenere tutti gli invitati (alias di prof)
+app.get('/api/invitati', async (req, res) => {
+  try {
+    const rows = await db.selectFromTable('prof');
+    res.json(rows);
+  } catch (error) {
+    console.error('Errore durante il recupero degli invitati:', error);
+    res.status(500).json({ error: 'Errore nel recupero degli invitati' });
+  }
+});
+
+// Rotta per aggiungere un invitato accettando l'invito
+app.post('/api/invitati', async (req, res) => {
+  try {
+    const { cognome, nome, voto } = req.body;
+    const insertId = await db.insertIntoTable('prof', {
+      cognome,
+      nome,
+      voto,
+      stato: 'accettato'
+    });
+    res.status(201).json({ id: insertId, cognome, nome, voto, stato: 'accettato' });
+  } catch (error) {
+    console.error('Errore durante l\'inserimento dell\'invitato:', error);
+    res.status(500).json({ error: 'Errore nell\'inserimento dei dati' });
+  }
+});
+
 // Rotta per aggiornare un professore
 app.put('/api/prof/:id', async (req, res) => {
   try {
