@@ -1,4 +1,14 @@
 {
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix invitoFront run dev",
+    "build": "npm --prefix invitoFront run build",
+    "lint": "npm --prefix invitoFront run lint",
+    "preview": "npm --prefix invitoFront run preview"
+  },
   "dependencies": {
     "react-router-dom": "^7.15.1"
   }
