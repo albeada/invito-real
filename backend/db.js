@@ -7,14 +7,13 @@ const client = process.env.DB_CLIENT === 'pg' ? 'pg' : 'mysql';
 let pool;
 if (client === 'pg') {
   pool = new PgPool({
-    // Incolla qui dentro l'host del SESSION POOLER che hai preso da Supabase
-    host: 'aws-0-eu-central-1.pooler.supabase.com', 
+    // Aggiornato a aws-1 come da tua stringa di Supabase
+    host: 'aws-1-eu-central-1.pooler.supabase.com', 
     
-    // Forziamo la porta del pooler (6543) scritta a mano senza "process.env"
     port: 6543, 
     
-    // Controlla su Supabase se l'utente del pooler è cambiato (es. postgres.ndjnm...)
-    user: process.env.DB_USER || 'postgres', 
+    // Aggiornato l'utente di riserva con quello lungo del tuo progetto
+    user: process.env.DB_USER || 'postgres.ndjnmbfvfgwcrfutekwp', 
     
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME || 'postgres',
