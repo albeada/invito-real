@@ -15,7 +15,8 @@ function Info() {
       setFetchError('');
 
       try {
-        const response = await fetch('http://localhost:3001/api/invitati');
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://invito-real.onrender.com';
+        const response = await fetch(`${apiUrl}/api/invitati`);
         if (!response.ok) {
           throw new Error('Impossibile caricare gli invitati');
         }
@@ -68,7 +69,7 @@ function Info() {
         </div>
 
         {loading ? (
-          <p className="guest-status">Caricamento in corso...</p>
+          <p className="guest-status">caricamento in corso...</p>
         ) : fetchError ? (
           <p className="guest-status error-message">{fetchError}</p>
         ) : invitati.length === 0 ? (
