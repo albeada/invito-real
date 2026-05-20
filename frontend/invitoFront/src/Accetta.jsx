@@ -19,7 +19,8 @@ function Accetta() {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/invitati', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://invito-real.onrender.com';
+      const response = await fetch(`${apiUrl}/api/invitati`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nome, cognome, dedica })

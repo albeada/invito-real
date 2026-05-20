@@ -10,6 +10,11 @@ app.use(cors());
 app.use(express.json());
 
 async function ensureProfColumns() {
+  if (db.client !== 'mysql') {
+    console.log('Skipping MySQL-specific schema checks for non-MySQL database');
+    return;
+  }
+
   try {
     const description = await db.describeTable('prof');
     const columns = new Set(description.map((column) => column.Field));
@@ -223,5 +228,5 @@ app.delete('/api/tables/:tableName/:id', async (req, res) => {
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
-  console.log(`Server in esecuzione su http://localhost:${port}/`);
+  console.log(`Server in esecuzione sulla porta ${port}`);
 });
