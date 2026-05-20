@@ -19,7 +19,7 @@ function Accetta() {
     }
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001' : 'https://invito-real.onrender.com');
+      const apiUrl = 'https://invito-real.onrender.com';
       const response = await fetch(`${apiUrl}/api/invitati`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

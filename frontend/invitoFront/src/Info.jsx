@@ -15,7 +15,7 @@ function Info() {
       setFetchError('');
 
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'https://invito-real.onrender.com';
+        const apiUrl = 'https://invito-real.onrender.com';
         const response = await fetch(`${apiUrl}/api/invitati`);
         if (!response.ok) {
           throw new Error('Impossibile caricare gli invitati');
