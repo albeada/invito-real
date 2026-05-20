@@ -7,12 +7,18 @@ const client = process.env.DB_CLIENT === 'pg' ? 'pg' : 'mysql';
 let pool;
 if (client === 'pg') {
   pool = new PgPool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432,
-    user: process.env.DB_USER,
+    // Incolla qui dentro l'host del SESSION POOLER che hai preso da Supabase
+    host: 'aws-0-eu-central-1.pooler.supabase.com', 
+    
+    // Forziamo la porta del pooler (6543) scritta a mano senza "process.env"
+    port: 6543, 
+    
+    // Controlla su Supabase se l'utente del pooler è cambiato (es. postgres.ndjnm...)
+    user: process.env.DB_USER || 'postgres', 
+    
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+    database: process.env.DB_NAME || 'postgres',
+    ssl: { rejectUnauthorized: false },
     max: 10
   });
 } else {
