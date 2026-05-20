@@ -9,6 +9,32 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+async function ensureProfColumns() {
+  try {
+    const description = await db.describeTable('prof');
+    const columns = new Set(description.map((column) => column.Field));
+
+    if (!columns.has('dedica')) {
+      await db.pool.query('ALTER TABLE prof ADD COLUMN dedica VARCHAR(255) NOT NULL DEFAULT "" AFTER nome');
+      console.log('Colonna "dedica" aggiunta alla tabella prof');
+    }
+
+    if (!columns.has('stato')) {
+      await db.pool.query('ALTER TABLE prof ADD COLUMN stato VARCHAR(50) NOT NULL DEFAULT "attivo" AFTER dedica');
+      console.log('Colonna "stato" aggiunta alla tabella prof');
+    }
+
+    if (!columns.has('voto')) {
+      await db.pool.query('ALTER TABLE prof ADD COLUMN voto INT NOT NULL DEFAULT 0 AFTER stato');
+      console.log('Colonna "voto" aggiunta alla tabella prof');
+    }
+  } catch (error) {
+    console.error('Impossibile verificare o creare le colonne della tabella prof:', error);
+  }
+}
+
+ensureProfColumns();
+
 // Rotta di prova
 app.get('/', (req, res) => {
   res.json({ message: 'Il backend Node.js funziona correttamente!' });
@@ -42,9 +68,18 @@ app.get('/api/prof/:id', async (req, res) => {
 // Rotta per aggiungere un professore
 app.post('/api/prof', async (req, res) => {
   try {
-    const { cognome, nome, voto, stato } = req.body;
-    const insertId = await db.insertIntoTable('prof', { cognome, nome, voto, stato });
-    res.status(201).json({ id: insertId, cognome, nome, voto, stato });
+    const { cognome, nome, dedica, voto, stato } = req.body;
+    const insertData = { cognome, nome, stato };
+    if (dedica !== undefined) {
+      insertData.dedica = dedica;
+      insertData.voto = voto !== undefined ? voto : 0;
+    } else if (voto !== undefined) {
+      insertData.voto = voto;
+    } else {
+      insertData.voto = 0;
+    }
+    const insertId = await db.insertIntoTable('prof', insertData);
+    res.status(201).json({ id: insertId, cognome, nome, dedica, voto, stato });
   } catch (error) {
     console.error('Errore durante l\'inserimento:', error);
     res.status(500).json({ error: 'Errore nell\'inserimento dei dati' });
@@ -65,14 +100,23 @@ app.get('/api/invitati', async (req, res) => {
 // Rotta per aggiungere un invitato accettando l'invito
 app.post('/api/invitati', async (req, res) => {
   try {
-    const { cognome, nome, voto } = req.body;
-    const insertId = await db.insertIntoTable('prof', {
+    const { cognome, nome, dedica, voto } = req.body;
+    const insertData = {
       cognome,
       nome,
-      voto,
       stato: 'accettato'
-    });
-    res.status(201).json({ id: insertId, cognome, nome, voto, stato: 'accettato' });
+    };
+    if (dedica !== undefined) {
+      insertData.dedica = dedica;
+      insertData.voto = 0;
+    } else if (voto !== undefined) {
+      insertData.voto = voto;
+    } else {
+      insertData.voto = 0;
+    }
+
+    const insertId = await db.insertIntoTable('prof', insertData);
+    res.status(201).json({ id: insertId, cognome, nome, dedica, voto, stato: 'accettato' });
   } catch (error) {
     console.error('Errore durante l\'inserimento dell\'invitato:', error);
     res.status(500).json({ error: 'Errore nell\'inserimento dei dati' });
@@ -82,12 +126,16 @@ app.post('/api/invitati', async (req, res) => {
 // Rotta per aggiornare un professore
 app.put('/api/prof/:id', async (req, res) => {
   try {
-    const { cognome, nome, voto, stato } = req.body;
-    const updated = await db.updateTable('prof', { cognome, nome, voto, stato }, { id: req.params.id });
+    const { cognome, nome, dedica, voto, stato } = req.body;
+    const updateData = { cognome, nome, stato };
+    if (dedica !== undefined) updateData.dedica = dedica;
+    if (voto !== undefined) updateData.voto = voto;
+
+    const updated = await db.updateTable('prof', updateData, { id: req.params.id });
     if (!updated) {
       return res.status(404).json({ error: 'Professore non trovato' });
     }
-    res.json({ id: req.params.id, cognome, nome, voto, stato });
+    res.json({ id: req.params.id, cognome, nome, dedica, voto, stato });
   } catch (error) {
     console.error('Errore durante l\'aggiornamento:', error);
     res.status(500).json({ error: 'Errore nell\'aggiornamento dei dati' });
