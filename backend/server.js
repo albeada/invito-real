@@ -202,5 +202,5 @@ app.delete('/api/tables/:tableName/:id', async (req, res) => {
 
 const port = process.env.PORT || 3001;
 app.listen(port, () => {
-  console.log(`Server in esecuzione su http://localhost:${port}/`);
+  console.log(`Server in esecuzione sulla porta ${port}`);
 });
