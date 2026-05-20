@@ -189,7 +189,28 @@ app.post('/api/tables/:tableName', async (req, res) => {
 // Rotta per eliminare da una tabella generica
 app.delete('/api/tables/:tableName/:id', async (req, res) => {
   try {
-    const deletedRows = await db.deleteFromTable(req.params.tableName, { id: req.params.id });
+    const { tableName, id } = req.params;
+
+    // If deleting from `prof` and the record is accepted, require admin token
+    if (tableName === 'prof') {
+      const rows = await db.selectFromTable('prof', { id });
+      if (rows.length === 0) {
+        return res.status(404).json({ error: 'Record non trovato' });
+      }
+      const record = rows[0];
+      if (record.stato === 'accettato') {
+        const authHeader = req.get('authorization') || req.get('x-admin-token') || '';
+        let token = '';
+        if (authHeader.startsWith('Bearer ')) token = authHeader.slice(7);
+        else token = authHeader;
+
+        if (!process.env.ADMIN_TOKEN || token !== process.env.ADMIN_TOKEN) {
+          return res.status(403).json({ error: 'Operazione consentita solo ad amministratori' });
+        }
+      }
+    }
+
+    const deletedRows = await db.deleteFromTable(tableName, { id });
     if (deletedRows === 0) {
       return res.status(404).json({ error: 'Record non trovato' });
     }
