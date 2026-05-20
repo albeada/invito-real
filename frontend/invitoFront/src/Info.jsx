@@ -15,7 +15,7 @@ function Info() {
       setFetchError('');
 
       try {
-        const response = await fetch('http://localhost:3001/api/invitati');
+        const response = await fetch('https://invito-real.onrender.com/api/invitati');
         if (!response.ok) {
           throw new Error('Impossibile caricare gli invitati');
         }
