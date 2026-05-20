@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+/*const mysql = require('mysql2/promise');
 const { Pool: PgPool } = require('pg');
 require('dotenv').config();
 
@@ -24,7 +24,39 @@ if (isPostgres) {
     queueLimit: 0
   });
 }
+*/
 
+const mysql = require('mysql2/promise');
+const { Pool: PgPool } = require('pg');
+require('dotenv').config();
+
+// Forza l'uso di Postgres se il client è impostato su 'pg'
+const client = process.env.DB_CLIENT === 'pg' ? 'pg' : 'mysql';
+
+let pool;
+if (client === 'pg') {
+  // Connessione a Postgres (Supabase) tramite parametri divisi, super sicura online
+  pool = new PgPool({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 5432,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+    max: 10
+  });
+} else {
+  pool = mysql.createPool({
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'invito',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+  });
+}
 function buildWhereClause(conditions) {
   const keys = Object.keys(conditions);
   if (keys.length === 0) return { clause: '', values: [] };
