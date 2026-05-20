@@ -79,7 +79,7 @@ function Info() {
               <li key={invitato.id} className="guest-card">
                 <div>
                   <strong>{invitato.nome} {invitato.cognome}</strong>
-                  <p>Voto: {invitato.voto}</p>
+                  <p>Dedica: {invitato.dedica || invitato.voto}</p>
                 </div>
                 <span className="guest-badge">Accettato</span>
               </li>

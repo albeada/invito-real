@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Accetta() {
+  const navigate = useNavigate();
   const [nome, setNome] = useState('');
   const [cognome, setCognome] = useState('');
-  const [voto, setVoto] = useState('');
+  const [dedica, setDedica] = useState('');
   const [status, setStatus] = useState('');
   const [error, setError] = useState('');
 
@@ -11,8 +13,8 @@ function Accetta() {
     setStatus('');
     setError('');
 
-    if (!nome || !cognome || voto === '') {
-      setError('Inserisci nome, cognome e voto per proseguire.');
+    if (!nome || !cognome || !dedica.trim()) {
+      setError('Inserisci nome, cognome e dedica per proseguire.');
       return;
     }
 
@@ -20,18 +22,15 @@ function Accetta() {
       const response = await fetch('http://localhost:3001/api/invitati', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nome, cognome, voto: Number(voto) })
+        body: JSON.stringify({ nome, cognome, dedica })
       });
 
       if (!response.ok) {
         throw new Error('Errore nell\'invio dell\'invito');
       }
 
-      const data = await response.json();
-      setStatus(`Invito registrato! Benvenuto, ${data.nome} ${data.cognome}.`);
-      setNome('');
-      setCognome('');
-      setVoto('');
+      await response.json();
+      navigate('/', { replace: true });
     } catch (err) {
       setError(err.message || 'Errore di rete. Riprova più tardi.');
     }
@@ -63,16 +62,14 @@ function Accetta() {
             onChange={(e) => setCognome(e.target.value)}
           />
 
-          <label htmlFor="voto">Voto</label>
+          <label htmlFor="dedica">Aggiunta di una dedica</label>
           <input
-            type="number"
-            id="voto"
-            name="voto"
-            placeholder="Voto"
-            min="0"
-            max="10"
-            value={voto}
-            onChange={(e) => setVoto(e.target.value)}
+            type="text"
+            id="dedica"
+            name="dedica"
+            placeholder="Aggiungi una dedica"
+            value={dedica}
+            onChange={(e) => setDedica(e.target.value)}
           />
         </div>
         <button className="primary" type="button" onClick={handleSubmit}>

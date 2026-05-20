@@ -232,6 +232,23 @@ button {
   padding: 0;
   display: grid;
   gap: 1rem;
+  max-height: calc(3 * 5.5rem + 2rem);
+  overflow-y: auto;
+  scroll-snap-type: y proximity;
+  padding-right: 0.25rem;
+}
+
+.guest-list li {
+  scroll-snap-align: start;
+}
+
+.guest-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.guest-list::-webkit-scrollbar-thumb {
+  background: rgba(141, 93, 48, 0.35);
+  border-radius: 999px;
 }
 
 .guest-card {
@@ -276,11 +293,14 @@ button {
   }
 
   .actions {
-    justify-content: stretch;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
   }
 
   .actions button {
-    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
   }
 
   .map-wrapper,
